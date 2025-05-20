@@ -20,12 +20,6 @@ public class PrescriptionWithMedicamentsDto
     public List<MedicamentDto> Medicaments { get; set; }
 }
 
-public class DoctorDto
-{
-    public int IdDoctor { get; set; }
-    public string FirstName { get; set; }
-}
-
 public class MedicamentDto
 {
     public int IdMedicament { get; set; }

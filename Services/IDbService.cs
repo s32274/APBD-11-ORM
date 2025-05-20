@@ -8,20 +8,7 @@ public interface IDbService
     public Task<PatientWithPrescriptonsDto?> GetPatientByIdAsync(int id, CancellationToken cancellationToken);
 
     public Task<int> AddNewPrescriptionByIdsAsync(
-        int idPatient,
-        string patientFirstName,
-        string patientLastName,
-        DateTime patientBirthDate,
-
-        int idDoctor,
-        string doctorFirstName,
-        string doctorLastName,
-        string doctorEmail,
-
-        ICollection<MedicamentDto> medicamentDtos,
-
-        DateTime date,
-        DateTime dueDate,
+        PatientsNewPrescriptionDto newPrescriptionDto,
         CancellationToken cancellationToken
     );
 }

@@ -36,7 +36,7 @@ public class DbService : IDbService
                         Doctor = new DoctorDto
                         {
                             IdDoctor = pr.Doctor.IdDoctor,
-                            FirstName = pr.Doctor.FirstName
+                            DoctorFirstName = pr.Doctor.FirstName
                         },
                         Medicaments = pr.PrescriptionMedicaments
                             .Select(pm => new MedicamentDto
@@ -53,23 +53,21 @@ public class DbService : IDbService
 
     // Wystawienie nowej recepty. Zwraca nowo utworzone ID recepty.
     public async Task<int> AddNewPrescriptionByIdsAsync(
-        int idPatient,
-        string patientFirstName,
-        string patientLastName,
-        DateTime patientBirthDate,
-        
-        int idDoctor,
-        string doctorFirstName,
-        string doctorLastName,
-        string doctorEmail,
-        
-        ICollection<MedicamentDto> medicamentDtos,
-        
-        DateTime date,
-        DateTime dueDate,
-        CancellationToken cancellationToken
-        )
+        PatientsNewPrescriptionDto newPrescriptionDto,
+        CancellationToken cancellationToken)
     {
+        var idPatient = newPrescriptionDto.Patient.IdPatient;
+        var patientFirstName = newPrescriptionDto.Patient.FirstName;
+        var patientLastName = newPrescriptionDto.Patient.LastName;
+        var patientBirthDate = newPrescriptionDto.Patient.BirthDate;
+
+        var idDoctor = newPrescriptionDto.Doctor.IdDoctor;
+        var doctorFirstName = newPrescriptionDto.Doctor.DoctorFirstName;
+        var doctorLastName = newPrescriptionDto.Doctor.DoctorLastName;
+        var medicamentDtos = newPrescriptionDto.Medicaments;
+        var date = newPrescriptionDto.Date;
+        var dueDate = newPrescriptionDto.DueDate;
+        
         // Sprawdza, czy due date nie jest wcześniej, niż date
         if (dueDate < date)
         {

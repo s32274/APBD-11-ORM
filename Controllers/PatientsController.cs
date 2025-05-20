@@ -17,49 +17,26 @@ namespace ORM.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPatientByIdAsync(int id, CancellationToken cancellationToken)
         {
-            var result = await _dbService.GetPatientByIdAsync(id, cancellationToken);
-            if (result == null)
+            var patientInfo = await _dbService.GetPatientByIdAsync(id, cancellationToken);
+            if (patientInfo == null)
                 return NotFound();
             
-            return Ok(result);
+            return Ok(patientInfo);
         }
 
         [HttpPost]
         public async Task<IActionResult> AddNewPrescriptionByIdsAsync(
-            int idPatient,
-            string patientFirstName,
-            string patientLastName,
-            DateTime patientBirthDate,
-        
-            int idDoctor,
-            string doctorFirstName,
-            string doctorLastName,
-            string doctorEmail,
-        
-            ICollection<MedicamentDto> medicamentDtos,
-        
-            DateTime date,
-            DateTime dueDate,
+            PatientsNewPrescriptionDto newPrescriptionDto,
             CancellationToken cancellationToken)
         {
             try
             {
-                var result = await _dbService.AddNewPrescriptionByIdsAsync(
-                    idPatient,
-                    patientFirstName,
-                    patientLastName,
-                    patientBirthDate,
-                    idDoctor,
-                    doctorFirstName,
-                    doctorLastName,
-                    doctorEmail,
-                    medicamentDtos,
-                    date,
-                    dueDate,
+                var newPrescriptionId = await _dbService.AddNewPrescriptionByIdsAsync(
+                    newPrescriptionDto,
                     cancellationToken
                 );
 
-                return Ok(result);
+                return Ok(newPrescriptionId);
             }
             catch (ArgumentException e)
             {
