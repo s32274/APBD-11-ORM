@@ -1,9 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using DefaultNamespace;
 using Microsoft.EntityFrameworkCore;
-
-namespace Tutorial5.Models;
 
 [PrimaryKey(nameof(IdMedicament), nameof(IdPrescription))]
 [Table("Prescription_Medicament")]
@@ -20,7 +17,7 @@ public class Prescription_Medicament
     [MaxLength(100)]
     public string Details { get; set; }
 
-    public Medicament Medicament { get; set; }
-    public Prescription Prescription { get; set; }
+    public virtual Medicament Medicament { get; set; }
+    public virtual Prescription Prescription { get; set; }
 
 }

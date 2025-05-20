@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using Tutorial5.Services;
+using ORM.Services;
 
-namespace Tutorial5.Controllers
+namespace ORM.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -13,10 +13,13 @@ namespace Tutorial5.Controllers
             _dbService = dbService;
         }
         
-        [HttpGet]
-        public async Task<IActionResult> GetPatientByIdAsync()
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetPatientByIdAsync(int id)
         {
-            var result = await _dbService.GetPatientByIdAsync();
+            var result = await _dbService.GetPatientByIdAsync(id);
+            if (result == null)
+                return NotFound();
+            
             return Ok(result);
         }
     }

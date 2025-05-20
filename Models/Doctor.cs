@@ -1,8 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using DefaultNamespace;
-
-namespace Tutorial5.Models;
+using ORM;
 
 [Table("Doctor")]
 public class Doctor
@@ -19,5 +17,5 @@ public class Doctor
     [MaxLength(100)]
     public string Email { get; set; }
     
-    public ICollection<Prescription> Prescriptions { get; set; }
+    public virtual ICollection<Prescription> Prescriptions { get; set; }
 }

@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
-namespace DefaultNamespace;
+using ORM;
 
 [Table("Patient")]
 public class Patient
@@ -17,5 +16,5 @@ public class Patient
     
     public DateTime BirthDate { get; set; }
     
-    public ICollection<Prescription> Prescriptions { get; set; }
+    public virtual ICollection<Prescription> Prescriptions { get; set; }
 }

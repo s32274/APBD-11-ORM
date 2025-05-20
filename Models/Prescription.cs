@@ -1,8 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Tutorial5.Models;
-
-namespace DefaultNamespace;
+using ORM;
 
 [Table("Prescription")]
 public class Prescription
@@ -23,5 +21,5 @@ public class Prescription
     public Doctor Doctor { get; set; }
     public Patient Patient { get; set; }
     
-    public ICollection<Prescription_Medicament> PrescriptionMedicaments;
+    public virtual ICollection<Prescription_Medicament> PrescriptionMedicaments { get; set; }
 }

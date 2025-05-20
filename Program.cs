@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using Tutorial5.Data;
-using Tutorial5.Services;
+using ORM.Data;
+using ORM.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

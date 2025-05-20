@@ -1,8 +1,8 @@
-﻿using Tutorial5.DTOs;
+﻿using ORM.DTOs;
 
-namespace Tutorial5.Services;
+namespace ORM.Services;
 
 public interface IDbService
 {
-    Task<List<PatientWithPrescriptonsDto>> GetPatientByIdAsync();
+    Task<PatientWithPrescriptonsDto?> GetPatientByIdAsync(int id);
 }

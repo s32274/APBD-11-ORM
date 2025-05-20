@@ -1,8 +1,6 @@
-﻿using DefaultNamespace;
-using Microsoft.EntityFrameworkCore;
-using Tutorial5.Models;
+﻿using Microsoft.EntityFrameworkCore;
 
-namespace Tutorial5.Data;
+namespace ORM.Data;
 
 public class PatientWardContext : DbContext
 {

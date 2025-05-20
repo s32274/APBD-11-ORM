@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
-namespace Tutorial5.Models;
+using ORM;
 
 [Table("Medicament")]
 public class Medicament
@@ -18,5 +17,5 @@ public class Medicament
     [MaxLength(100)]
     public string Type { get; set; }
 
-    public ICollection<Prescription_Medicament> PrescriptionMedicaments { get; set; }
+    public virtual ICollection<Prescription_Medicament> PrescriptionMedicaments { get; set; }
 }
