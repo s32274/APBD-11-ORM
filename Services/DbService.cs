@@ -16,7 +16,7 @@ public class DbService : IDbService
     }
     
     // Wyświetlenie wszystkich danych na temat konkretnego pacjenta, wraz z listę recept i leków, które pobrał.
-    public async Task<PatientWithPrescriptonsDto?> GetPatientByIdAsync(int id)
+    public async Task<PatientWithPrescriptonsDto?> GetPatientByIdAsync(int id, CancellationToken cancellationToken)
     {
         return await _context.Patients
             .Where(p => p.IdPatient == id)
@@ -48,7 +48,7 @@ public class DbService : IDbService
                             }).ToList()
                     }).ToList()
             })
-        .FirstOrDefaultAsync();
+        .FirstOrDefaultAsync(cancellationToken);
     }
 
     // Wystawienie nowej recepty. Zwraca nowo utworzone ID recepty.
@@ -66,7 +66,8 @@ public class DbService : IDbService
         ICollection<MedicamentDto> medicamentDtos,
         
         DateTime date,
-        DateTime dueDate
+        DateTime dueDate,
+        CancellationToken cancellationToken
         )
     {
         // Sprawdza, czy due date nie jest wcześniej, niż date
@@ -81,52 +82,54 @@ public class DbService : IDbService
             throw new ArgumentException("A prescription cannot contain more than 10 medicaments");
         }
 
-        using var transaction = await _context.Database.BeginTransactionAsync();
+        using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
         
         // Sprawdza, czy istnieje podany lekarz
-        var doctorExistence = await _context.Doctors
-            .Where(d => d.IdDoctor == idDoctor)
-            .Select(d => d.IdDoctor)
-            .ToListAsync();
+        var doctor = await _context.Doctors
+            .FromSqlRaw("SELECT * FROM Doctor WITH (UPDLOCK) WHERE IdDoctor = {0}", idDoctor)
+            .FirstOrDefaultAsync(cancellationToken);
 
-        if (doctorExistence.Count == 0)
+        if (doctor == null)
         {
-            throw new ArgumentException("Doctor " + doctorFirstName + " " + doctorLastName +
-                                        " doesn't exist in the database");
+            await transaction.RollbackAsync(cancellationToken);
+            throw new ArgumentException("Doctor " + doctorFirstName + " " + doctorLastName + " doesn't exist in the database.");
         }
         
         // Sprawdza, czy istnieją podane leki
-        var medicamentIds = medicamentDtos.Select(m => m.IdMedicament).ToList();
-        var databaseMedicamentIds = await _context.Medicaments
-            .Where(m => medicamentIds.Contains(m.IdMedicament))
-            .Select(m => m.IdMedicament)
-            .ToListAsync();
-
-        if (databaseMedicamentIds.Count != medicamentIds.Count)
+        foreach (var med in medicamentDtos)
         {
-            throw new ArgumentException("Not all input medicaments exist in the database.");
+            var medicamentExists = await _context.Medicaments
+                .FromSqlRaw("SELECT * FROM Medicament WITH (UPDLOCK) WHERE IdMedicament = {0}", med.IdMedicament)
+                // "{0}" zapobiega SQL injection
+                .AnyAsync(cancellationToken);
+
+            if (!medicamentExists)
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                throw new ArgumentException("Medicament with ID " + med.IdMedicament + " does not exist.");
+            }
         }
         
         // Sprawdza, czy istnieje podany pacjent
-        var patientExistence = await _context.Patients
-            .Where(p => p.IdPatient == idPatient)
-            .Select(p => p.IdPatient)
-            .ToListAsync();
+        var patient = await _context.Patients
+            .FromSqlRaw("SELECT * FROM Patient WITH (UPDLOCK) WHERE IdPatient = {0}", idPatient)
+            .FirstOrDefaultAsync(cancellationToken);
 
-        if (patientExistence.Count == 0)
+        if (patient == null)
         {
             // Jeśli podany pacjent nie istniał w bazie, dodaje go do bazy
-            var newPatient = new Patient()
+            patient = new Patient
             {
                 IdPatient = idPatient,
                 FirstName = patientFirstName,
                 LastName = patientLastName,
                 BirthDate = patientBirthDate
             };
-            _context.Patients.Add(newPatient);
-            await _context.SaveChangesAsync();
+            _context.Patients.Add(patient);
+            await _context.SaveChangesAsync(cancellationToken);
         }
-
+        
+        // Dodaje nową receptę do bazy danych
         var newPrescription = new Prescription
         {
             Date = date,
@@ -135,7 +138,7 @@ public class DbService : IDbService
             IdDoctor = idDoctor
         };
         _context.Prescriptions.Add(newPrescription);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(cancellationToken);
 
         var prescriptionMedicaments = medicamentDtos.Select(m => new Prescription_Medicament()
         {
@@ -146,8 +149,9 @@ public class DbService : IDbService
         });
 
         await _context.PrescriptionMedicaments.AddRangeAsync(prescriptionMedicaments);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(cancellationToken);
 
+        await transaction.CommitAsync(cancellationToken);
         return newPrescription.IdPrescription;
     }
 

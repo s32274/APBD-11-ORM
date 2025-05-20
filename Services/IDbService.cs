@@ -5,7 +5,7 @@ namespace ORM.Services;
 
 public interface IDbService
 {
-    public Task<PatientWithPrescriptonsDto?> GetPatientByIdAsync(int id);
+    public Task<PatientWithPrescriptonsDto?> GetPatientByIdAsync(int id, CancellationToken cancellationToken);
 
     public Task<int> AddNewPrescriptionByIdsAsync(
         int idPatient,
@@ -21,6 +21,7 @@ public interface IDbService
         ICollection<MedicamentDto> medicamentDtos,
 
         DateTime date,
-        DateTime dueDate
+        DateTime dueDate,
+        CancellationToken cancellationToken
     );
 }

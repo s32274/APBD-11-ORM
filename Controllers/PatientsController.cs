@@ -15,9 +15,9 @@ namespace ORM.Controllers
         }
         
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetPatientByIdAsync(int id)
+        public async Task<IActionResult> GetPatientByIdAsync(int id, CancellationToken cancellationToken)
         {
-            var result = await _dbService.GetPatientByIdAsync(id);
+            var result = await _dbService.GetPatientByIdAsync(id, cancellationToken);
             if (result == null)
                 return NotFound();
             
@@ -39,25 +39,33 @@ namespace ORM.Controllers
             ICollection<MedicamentDto> medicamentDtos,
         
             DateTime date,
-            DateTime dueDate
-        )
+            DateTime dueDate,
+            CancellationToken cancellationToken)
         {
-            var result = await _dbService.AddNewPrescriptionByIdsAsync(
-                idPatient,
-                patientFirstName,
-                patientLastName,
-                patientBirthDate,
-                idDoctor,
-                doctorFirstName,
-                doctorLastName,
-                doctorEmail,
-                medicamentDtos,
-                date,
-                dueDate
-            );
+            try
+            {
+                var result = await _dbService.AddNewPrescriptionByIdsAsync(
+                    idPatient,
+                    patientFirstName,
+                    patientLastName,
+                    patientBirthDate,
+                    idDoctor,
+                    doctorFirstName,
+                    doctorLastName,
+                    doctorEmail,
+                    medicamentDtos,
+                    date,
+                    dueDate,
+                    cancellationToken
+                );
 
-            return Ok(idPatient);
+                return Ok(result);
+            }
+            catch (ArgumentException e)
+            {
+                Console.WriteLine(e.Message);
+                return NotFound();
+            }
         }
-
     }
 }
