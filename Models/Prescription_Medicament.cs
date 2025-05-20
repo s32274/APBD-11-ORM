@@ -22,4 +22,5 @@ public class Prescription_Medicament
 
     public Medicament Medicament { get; set; }
     public Prescription Prescription { get; set; }
+
 }

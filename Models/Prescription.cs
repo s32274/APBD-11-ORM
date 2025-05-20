@@ -22,4 +22,6 @@ public class Prescription
     
     public Doctor Doctor { get; set; }
     public Patient Patient { get; set; }
+    
+    public ICollection<Prescription_Medicament> PrescriptionMedicaments;
 }

@@ -14,15 +14,16 @@ public class DbService : IDbService
     
     public async Task<List<PatientWithPrescriptonsDto>> GetPatientByIdAsync()
     {
-        var books = await _context.Books.Select(e =>
+        var books = await _context.Patients.Select(e =>
         new PatientWithPrescriptonsDto {
-            Name = e.Name,
-            Price = e.Price,
-            Authors = e.BookAuthors.Select(a =>
-            new AuthorDto {
-                FirstName = a.Author.FirstName,
-                LastName = a.Author.LastName
-            }).ToList()
+            IdPatient = e.IdPatient,
+            FirstName = e.FirstName,
+            LastName = e.LastName,
+            Birthdate = e.BirthDate,
+            PrescriptionWithMedicamentsDto = e.PrescriptionMedicaments.Select(a =>
+                new AuthorDto {
+                
+                }).ToList()
         }).ToListAsync();
         return books;
     }

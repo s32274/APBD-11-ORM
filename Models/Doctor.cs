@@ -19,5 +19,5 @@ public class Doctor
     [MaxLength(100)]
     public string Email { get; set; }
     
-    public ICollection<Prescription> prescriptions { get; set; }
+    public ICollection<Prescription> Prescriptions { get; set; }
 }
